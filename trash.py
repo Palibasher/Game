@@ -41,41 +41,6 @@ from random import randint
 #     return self.hp
 #
 #
-# def fight1(self):
-#     count = 0
-#     p = 0
-#     print(
-#         f"Вам встретился {self.name}, он настроен {self.d1[self.a]} по отношению к вам,\n"
-#         f"вы это поняли, глядя как он {self.d2[self.a]}.\n")
-#     while self.hp > 0 and p != 1:
-#         p_hit = int(input("Насколько сильно ударить?  Напишите число: \n"
-#                           "1. Врезать со всей силы\n2. Сильно\n3. Дать пощечину\n"))
-#         if p_hit == 1:
-#             p_hit = 10
-#             self.hp = self.hp - p_hit
-#             if self.hp > 0:
-#                 print(f"Вы ударили {self.name}, доставили ему {p_hit} урона и у него осталось {self.hp}")
-#             else:
-#                 print("О да!")
-#         elif p_hit == 2:
-#             p_hit = 5
-#             self.hp = self.hp - p_hit
-#             if self.hp > 0:
-#                 print(f"Вы ударили {self.name}, доставили ему {p_hit} урона и у него осталось {self.hp}")
-#             else:
-#                 print("О да!")
-#         elif p_hit == 3:
-#             print("Вы только разозлили гоблинца еще больше")
-#             count += 1
-#             if count == 2:
-#                 print(f"{self.name} разозлился так сильно, что убил вас")
-#                 p = 1
-#     if p == 0:
-#         print(
-#             f"Вы убили {self.name}, мать вашу! А потом {self.d3[self.a]}")
-#     else:
-#         print("Вы умерле жидко пукнув")
-#
 #
 #
 # #############функция перезаписи хар-тик
@@ -89,16 +54,11 @@ from random import randint
 #             self.player.defence = self.player.armor_pt + self.player.armor_bonus
 #             self.player.light_hit = round(self.player.output_dmg * 0.7)
 #             self.player.medium_hit = round(self.player.output_dmg * 1.3)
-#             self.player.mega_hit = self.player.output_dmg * 2
-name_gen = [["Ба", "Та", "Жо", "Бо", "До", "Ту", "Ти", "Ко", "Фо", "Ди", "Фи", "Лу", "Му", "Ду", "Ку", "Ла", "Но", "Ке", "Пе", "Де", "Ун", "Не", "Де", "Ке",],
-                    [ "би", "ди", "ни", "ки", "ри", "до", "де", "ке", "се", "не", "фе", "ме", "ми", "ци", "це", "ре", "же", "ле"],
-                    [ "усм", "есм", "кус", "пук", "пек", "бек", "ос", "юс", "юм", "бюкмс", "бей", "бак", "бас", "дос", "масмс", "дискис", "жормас", "кесм", "пипм", "писм", "кюкм"]]
-name = str(name_gen[0][randint(0,23)]) + str(name_gen[1][randint(0,17)]) + str(name_gen[2][randint(0,20)])
-i = 0
-while i < 10:
-    name = str(name_gen[0][randint(0, 23)]) + str(name_gen[1][randint(0, 17)]) + str(name_gen[2][randint(0, 20)])
-    i += 1
-    print(name)
+enemy_mood = {0: ["Нейтрально", "Я могу не только подсказать, но и составить вам компанию!"],
+                       1: ["Недружелюбно", "Моя не понимать биолетека.."],
+                       2: ["Враждебно", "Сдавайся человечищка, иначе моя твоя убивать"],
+                       3: ["Кровожадно", "О, дружок, я сейчас тебе подскажу.. смотри, вооо-о-оо-он там!"]}
+print(enemy_mood[0][1])
 weapons = {"Руки": [5, 0, "Руки как руки, тумаков надавать можно."],
            "Тупой кинжал": [7, 60, "Тупой и ржавый кинжал, но им можно больно колоться. А рукояткой можно надавать тумаков"],
            "Дубинка c шипами": [8, 50, "Увесистая такая дубинка из крепкого дерева, годится, что бы раздавать тумаки."],
@@ -138,3 +98,189 @@ jokes = {"Пустой флакон из под зелья":[10, 65, "Кто т�
                                              "ты чё? ебанутый? чё ты там делаешь? батя кстати всё время какие-то травы пьёт, чтобы срать часто, срёт по 5 раз в день,\n"
                                              "а потом говорит, что жопу жжёт, и ещё пердит он. пиздец короче! реальная история. я не тролль"]
          }
+
+#простая фунция передвижения игрока по плоскому полю
+def make_move(self, lvlmap):
+    if self.pos_x == 0 and self.pos_y == 0:  # верхний левый угол, начало
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Восток\n"
+                                "2. Юг\n"))
+        if where_to_go == 1:
+            self.pos_x += 1
+        elif where_to_go == 2:
+            self.pos_y += 1
+    elif self.pos_x == self.pos_xx and self.pos_y == self.pos_yy:  # нижний правый угол
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Север\n"
+                                "2. Запад\n"))
+        if where_to_go == 1:
+            self.pos_y -= 1  # Север
+        elif where_to_go == 2:
+            self.pos_x -= 1  # Запад
+    elif self.pos_x == 0 and self.pos_y == self.pos_yy:  # нижний левый угол
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Север\n"
+                                "2. Восток\n"))
+        if where_to_go == 2:
+            self.pos_x += 1  # Восток
+        elif where_to_go == 1:
+            self.pos_y -= 1  # Север
+    elif self.pos_x == self.pos_xx and self.pos_y == 0:  # верхний правый угол
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Юг\n"
+                                "2. Запад\n"))
+        if where_to_go == 1:
+            self.pos_y += 1  # Юг
+        elif where_to_go == 2:
+            self.pos_x -= 1  # Запад
+    elif self.pos_x == 0:  # левая сторона
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Восток\n"
+                                "2. Юг\n"
+                                "3. Север\n"))
+        if where_to_go == 1:
+            self.pos_x += 1
+        elif where_to_go == 2:
+            self.pos_y += 1
+        elif where_to_go == 3:
+            self.pos_y -= 1
+    elif self.pos_y == 0:  # верхняя сторона
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Восток\n"
+                                "2. Юг\n"
+                                "3. Запад\n"))
+        if where_to_go == 1:
+            self.pos_x += 1  # Восток
+        elif where_to_go == 2:
+            self.pos_y += 1  # Юг
+        elif where_to_go == 3:
+            self.pos_x -= 1  # Запад
+    elif self.pos_x == self.pos_xx:  # правая сторона
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Юг\n"
+                                "2. Север\n"
+                                "3. Запад\n"))
+        if where_to_go == 1:
+            self.pos_y += 1  # Юг
+        elif where_to_go == 2:
+            self.pos_y -= 1  # Север
+        elif where_to_go == 3:
+            self.pos_x -= 1  # Запад
+    elif self.pos_y == self.pos_yy:  # нижняя сторона
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Восток\n"
+                                "2. Север\n"
+                                "3. Запад\n"))
+        if where_to_go == 1:
+            self.pos_x += 1  # Восток
+        elif where_to_go == 2:
+            self.pos_y -= 1  # Север
+        elif where_to_go == 3:
+            self.pos_x -= 1  # Запад
+    else:  # не угол и не периметр
+        where_to_go = int(input("Куда двинуться?\n"
+                                "1. Восток\n"
+                                "2. Юг\n"
+                                "3. Север\n"
+                                "4. Запад\n"))
+        if where_to_go == 1:
+            self.pos_x += 1  # Восток
+        elif where_to_go == 2:
+            self.pos_y += 1  # Юг
+        elif where_to_go == 3:
+            self.pos_y -= 1  # Север
+        elif where_to_go == 4:
+            self.pos_x -= 1  # Запад
+def make_path_in_out(lvlmap):
+    max_y, max_x = len(lvlmap), len((lvlmap[0]))
+    next_step = (0, 0)
+    end_point = (max_x - 1, max_y - 1)
+    path = []
+    def go_up(next_step):
+        next_step = (next_step[0], next_step[1] - 1)  # верх
+        return next_step
+    def go_down(next_step):
+        next_step = (next_step[0], next_step[1] + 1)  # низ
+        return next_step
+    def go_right(next_step):
+        next_step = (next_step[0] + 1, next_step[1])  # право
+        return next_step
+    def go_left(next_step):
+        next_step = (next_step[0] - 1, next_step[1]) #лево
+        return next_step
+    def up_down_left_right(next_step):
+        if randint(0, 1) == 0: #право лево либо верх низ
+            if randint(0, 1) == 0: #право лево
+                next_step = go_right(next_step) #право
+            else:
+                next_step = go_left(next_step) #право лево
+        else:
+            if randint(0, 1) == 0: #верх низ
+                next_step = go_down(next_step)
+            else:
+                next_step = go_up(next_step) #верх
+        return next_step
+    while next_step != end_point:
+        if next_step in path:
+            next_step = (0, 0)
+            path = []
+        else:
+            if 0 < next_step[0] < end_point[0] and 0 < next_step[1] < end_point[1]: #тело матрицы
+                path.append(next_step)
+                next_step = up_down_left_right(next_step)
+            elif next_step[0] == 0 and next_step[1] == 0:  # верхний левый угол
+                path.append(next_step)
+                if randint(0, 1) == 1:
+                    next_step = go_down(next_step)
+                else:
+                    next_step = go_right(next_step)
+            elif next_step[0] == end_point[0] and next_step[1] == 0:  # верхний правый угол
+                path.append(next_step)
+                if randint(0, 1) == 1:
+                    next_step = go_down(next_step)
+                else:
+                    next_step = go_left(next_step)
+            elif next_step[0] == 0 and next_step[1] == end_point[1]:  # нижний левый угол
+                path.append(next_step)
+                if randint(0, 1) == 1:
+                    next_step = go_up(next_step)
+                else:
+                    next_step = go_right(next_step)
+            elif 0 < next_step[0] < end_point[0] and next_step[1] == 0:  # верхняя граница без углов
+                path.append(next_step)
+                a = randint(0, 2)
+                if a == 0:
+                    next_step = go_left(next_step)
+                elif a == 1:
+                    next_step = go_right(next_step)
+                else:
+                    next_step = go_down(next_step)
+            elif 0 < next_step[0] < end_point[0] and next_step[1] == end_point[1]:  # нижняя граница без углов
+                path.append(next_step)
+                a = randint(0, 2)
+                if a == 0:
+                    next_step = go_left(next_step)
+                elif a == 1:
+                    next_step = go_right(next_step)
+                else:
+                    next_step = go_up(next_step)
+            elif next_step[0] == end_point[0] and 0 < next_step[1] < end_point[1]:  # правая граница без углов
+                path.append(next_step)
+                a = randint(0, 2)
+                if a == 0:
+                    next_step = go_left(next_step)
+                elif a == 1:
+                    next_step = go_down(next_step)
+                else:
+                    next_step = go_up(next_step)
+            elif next_step[0] == 0 and 0 < next_step[1] < end_point[1]:  # левая граница без углов
+                path.append(next_step)
+                a = randint(0, 2)
+                if a == 0:
+                    next_step = go_right(next_step)
+                elif a == 1:
+                    next_step = go_down(next_step)
+                else:
+                    next_step = go_up(next_step)
+    path.append(next_step)
+    return path

@@ -1,4 +1,6 @@
 from random import randint
+from map import matrix_print
+
 weapons = {"Руки": [5, 0, "Руки как руки, тумаков надавать можно."],
            "Тупой кинжал": [7, 60, "Тупой и ржавый кинжал, но им можно больно колоться. А рукояткой можно надавать тумаков"],
            "Дубинка c шипами": [8, 50, "Увесистая такая дубинка из крепкого дерева, годится, что бы раздавать тумаки."],
@@ -41,7 +43,12 @@ jokes = {"Пустой флакон из под зелья":[10, 65, "Кто т�
 
 class Enemy:
     """Класс для Врага"""
-    def __init__(self, name, str, base_hp, agi, class_name = "Общий класс врага", armour = ["Броня", 5, "Такой нет"], weapon = ["Оружие", 0], weapon_pt = 0):
+    mood = randint(0, 3)
+    enemy_mood = {0: ["Нейтрально", "blank"],
+                  1: ["Недружелюбно", "blank"],
+                  2: ["Враждебно", "blank"],
+                  3: ["Кровожадно", "blank"]}
+    def __init__(self, name, str, base_hp, agi, mood = mood, enemy_mood = enemy_mood, class_name = "Общий класс врага", armour = ["Броня", 5, "Такой нет"], weapon = ["Оружие", 0], weapon_pt = 0):
         self.class_name = class_name
         self.name = name #имя врага
         self.str = str # сила
@@ -53,6 +60,8 @@ class Enemy:
         self.weapon = weapon
         self.weapon_pt = self.weapon[1] #урон оружия
         self.weapon_description = self.weapon[2]
+        self.enemy_mood = enemy_mood
+        self.mood = mood
         # self.dmg = self.weapon_pt * self.dmg_coefficient #урон
         # self.output_dmg = round(self.dmg * randint(40,120)/100)
     def dmg_coefficient(self):
@@ -64,7 +73,8 @@ class Enemy:
     def get_devparam(self):
         print(f"Класс: {self.class_name}, Имя : {self.name}, сила : {self.str}, броня: {self.base_armour} {self.defence}, оружие - {self.weapon}, урон оружия - {self.weapon_pt}, коэф - {self.dmg_coefficient()}, итоговый урон = {self.new_hit()}\n"
               f"Описание оружия: {self.weapon_description}")
-
+    def get_class_name(self):
+        return self.class_name
 
 
 class Spicked_frog(Enemy):
@@ -89,19 +99,18 @@ class Goblin(Enemy):
                         "Плетка": [5, "Что этот гоблин задумал?."],
                         "Копье": [5, "Копье слишком велико для гоблина, вряд ли сможет нанести им много урона."],
                         "Нож": [8, "Хочешь знать, почему я использую нож? Пушки слишком быстры, не успеваешь насладиться, получить истинное удовольствие, а когда я использую нож,\nв этот самый последний момент раскрывается ВСЯ человеческая сущность, и в каком-то смысле я знаю твоих друзей лучше, чем ты."],}
-        goblin_mood = {0: ["Нейтрально", "Я могу не только подсказать, но и составить вам компанию!" ],
-                       1: ["Недружелюбно", "Моя не понимать биолетека.."],
-                       2: ["Враждебно", "Сдавайся человечищка, иначе моя твоя убивать"],
-                       3: ["Кровожадно", "О, дружок, я сейчас тебе подскажу.. смотри, вооо-о-оо-он там!"]}
+        enemy_mood = {0: ["Нейтрально", "Я могу не только подсказать, но и составить вам компанию!", "И это после того, как вы пытались меня убить?", "Хорошо, забудем разногласия и закопаем топор войны"],
+                       1: ["Недружелюбно", "Моя не понимать биолетека..", "Я тебя убивать и делать из твоя черепа горшок!"],
+                       2: ["Враждебно", "Сдавайся человечищка, иначе моя твоя убивать", "Вот тебе биолетека, сраный человечишка!!"],
+                       3: ["Кровожадно", "О, дружок, моя тебе подскажу подскажу.. смотри, вооо-о-оо-он там!", "О, дружок, моя тебе подскажу подскажу.. смотри, вооо-о-оо-он там!"]}
         name = str(name_gen[0][randint(0,23)]) + str(name_gen[1][randint(0,17)]) + str(name_gen[2][randint(0,20)])
-        super().__init__(name = name, class_name="Гоблин", str = 10, base_hp =50, agi = -5, goblin_mood = goblin_mood[mood], armour = ["Стеганная броня", 7, "На гоблине одета курточка, из плотного, но криво прошитого материала, который немножко смягчает тумаки"], weapon = [[*weapons_list.keys()][a], weapons_list[[*weapons_list.keys()][a]][0], weapons_list[[*weapons_list.keys()][a]][1]])
+        super().__init__(name = name, class_name="Гоблин", str = 10, base_hp =50, agi = -5, mood = mood, enemy_mood = enemy_mood[mood], armour = ["Стеганная броня", 7, "На гоблине одета курточка, из плотного, но криво прошитого материала, который немножко смягчает тумаки"], weapon = [[*weapons_list.keys()][a], weapons_list[[*weapons_list.keys()][a]][0], weapons_list[[*weapons_list.keys()][a]][1]])
     def __str__(self):
-        return 1
-    def get_class_name(self):
-        return "Гоблин"
+        return f'Этот гоблин - низкорослый, уродливый и {str(self.enemy_mood[0]).lower()} настроен к вам. Землистого цвета кожа, большой, плоский нос, глаза раскосые в форме фисташек.\n'
+
 class Player:
     """Класс для Игрока"""
-    def __init__(self, name, raw_str, raw_int, raw_agi, amulet = ["Веревочка",[2, 0, 0, 0, 0, 0]], armor = ["Рваная рубаха", 2], weapon = ["Руки", 5], raw_hp = 100):
+    def __init__(self, name, raw_str, raw_int, raw_agi, amulet = ["Веревочка",[2, 0, 0, 0, 0, 0]], armor = ["Рваная рубаха", 2], weapon = ["Руки", 5], raw_hp = 100, pos_xx = 0, pos_yy = 0):
         """Задаем имя, пол, кол-во хп"""
         self.a = randint(0, 5) # кубик на будущее
         self.name = name #имя игрока
@@ -116,6 +125,13 @@ class Player:
         self.amulet = amulet[0] # какие амулеты надеты
         self.amulet_pt = [0, 0, 0, 0, 0, 0]
         self.raw_hp = raw_hp
+        self.pos_x = 0
+        self.pos_y = 0
+        self.pos_yy = pos_yy - 1
+        self.pos_xx = pos_xx - 1
+        self.move_message = None
+        self.next_lvl_key = 0
+
     #Блок функций для пересчета ключевых характеристик
     def health_bonus(self):
         return self.amulet_pt[3]  # бонус от возможного амулета здоровья
@@ -137,8 +153,150 @@ class Player:
         return self.output_dmg() * 2
     def defence(self):
         return self.armor_pt + self.armour_bonus()
-
-
+    def make_move(self,lvlmap):
+        """Функция перемещения по карте, учитывает периметр и проверяя наличие стены, выдает соотвествующую инфу"""
+        if self.move_message != None:
+            print(self.move_message)
+        option_r = True  # восточное направление
+        option_u = True  # северное направление
+        option_l = True  # западное направление
+        option_d = True # южное направление
+        if self.pos_x == 0 and self.pos_y == 0: #верхний левый угол, начало
+            option_d = lvlmap[self.pos_y + 1][self.pos_x]
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡇 \n"))
+            if where_to_go == 1 and option_r.digger_was_here == True: #проверяем, можно ли пойти вправо
+                self.pos_x += 1
+                self.move_message = None
+            elif where_to_go == 2 and option_d.digger_was_here == True: #проверяем, можно ли пойти вниз
+                self.pos_y += 1
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_x == self.pos_xx and self.pos_y == self.pos_yy: #нижний правый угол
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]   # западное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡄\n2. 🡅\n"))
+            if where_to_go == 2 and option_u.digger_was_here == True:
+                self.pos_y -= 1  # Запад
+                self.move_message = None
+            elif where_to_go == 1 and option_l.digger_was_here == True:
+                self.pos_x -= 1  # Север
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_x == 0 and self.pos_y == self.pos_yy: #нижний левый угол
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]  # восточное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡅\n"))
+            if where_to_go == 1 and option_r.digger_was_here == True:
+                self.pos_x += 1  # Восток
+                self.move_message = None
+            elif where_to_go == 2 and option_u.digger_was_here == True:
+                self.pos_y -= 1  # Север
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_x == self.pos_xx and self.pos_y == 0: #верхний правый угол
+            option_d = lvlmap[self.pos_y + 1][self.pos_x]  # южное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]   # западное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡄\n2. 🡇\n"))
+            if where_to_go == 2 and option_d.digger_was_here == True:
+                self.pos_y += 1
+                self.move_message = None
+            elif where_to_go == 1 and option_l.digger_was_here == True:
+                self.pos_x -= 1  # Юг
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_x == 0: #левая сторона
+            option_d = lvlmap[self.pos_y + 1][self.pos_x] # южное направление
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]  # восточное направление
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡇\n3. 🡅\n"))
+            if where_to_go == 1 and option_r.digger_was_here == True:
+                self.pos_x += 1
+                self.move_message = None
+            elif where_to_go == 2 and option_d.digger_was_here == True:
+                self.pos_y += 1
+                self.move_message = None
+            elif where_to_go == 3 and option_u.digger_was_here == True:
+                self.pos_y -= 1
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_y == 0: #верхняя сторона
+            option_d = lvlmap[self.pos_y + 1][self.pos_x]  # южное направление
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]  # восточное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]  # западное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡄\n3. 🡇\n"))
+            if where_to_go == 1 and option_r.digger_was_here == True:
+                self.pos_x += 1  # Восток
+                self.move_message = None
+            elif where_to_go == 3 and option_d.digger_was_here == True:
+                self.pos_y += 1  # Юг
+                self.move_message = None
+            elif where_to_go == 2 and option_l.digger_was_here == True:
+                self.pos_x -= 1  # Запад
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_x == self.pos_xx: #правая сторона
+            option_d = lvlmap[self.pos_y + 1][self.pos_x]  # южное направление
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]   # западное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡄\n2. 🡅\n3. 🡇\n"))
+            if where_to_go == 3 and option_d.digger_was_here == True:
+                self.pos_y += 1  # Юг
+                self.move_message = None
+            elif where_to_go == 2 and option_u.digger_was_here == True:
+                self.pos_y -= 1  # Север
+                self.move_message = None
+            elif where_to_go == 1 and option_l.digger_was_here == True:
+                self.pos_x -= 1
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        elif self.pos_y == self.pos_yy: #нижняя сторона
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]  # восточное направление
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]   # западное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡄\n3. 🡅\n"))
+            if where_to_go == 1 and option_r.digger_was_here == True:
+                self.pos_x += 1  # Восток
+                self.move_message = None
+            elif where_to_go == 3 and option_u.digger_was_here == True:
+                self.pos_y -= 1  # Север
+                self.move_message = None
+            elif where_to_go == 2 and option_l.digger_was_here == True:
+                self.pos_x -= 1  # Запад
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
+        else: #не угол и не периметр
+            option_r = lvlmap[self.pos_y][self.pos_x + 1]  # восточное направление
+            option_u = lvlmap[self.pos_y - 1][self.pos_x]  # северное направление
+            option_l = lvlmap[self.pos_y][self.pos_x - 1]   # западное направление
+            option_d = lvlmap[self.pos_y + 1][self.pos_x]  # южное направление
+            where_to_go = int(input("Куда двинуться?\n1. 🡆\n2. 🡄\n3. 🡅\n4. 🡇\n"))
+            if where_to_go == 1 and option_r.digger_was_here == True:
+                # print(option_r.digger_was_here)
+                self.pos_x += 1 #Восток
+                self.move_message = None
+            elif where_to_go == 4 and option_d.digger_was_here == True:
+                # print(option_d.digger_was_here)
+                self.pos_y += 1 #Юг
+                self.move_message = None
+            elif where_to_go == 3 and option_u.digger_was_here == True:
+                # print(option_u.digger_was_here)
+                self.pos_y -= 1 #Север
+                self.move_message = None
+            elif where_to_go == 2 and option_l.digger_was_here == True:
+                # print(option_l.digger_was_here)
+                self.pos_x -= 1 #Запад
+                self.move_message = None
+            else:
+                self.move_message = "Стена не дает пройти!"
     def get_name(self):
         """Функция возвращает Имя"""
         return self.name
@@ -187,21 +345,112 @@ class Player:
         else:
             print(f"Извини {self.name}, но сумка пуста, ничего нет..")
     def add_scroll(self, scr = 1):
-        move_1 = int(input("На стене, в щелке между камнями, вы заметили какую то рваную бумажку. Взять?\n1. Да\n2. Кто-то бычок засунул... нет.\n"))
+        move_1 = int(input("На полу, в щеле между камнями, вы заметили какую то рваную бумажку. Взять?\n1. Да\n2. Кто-то бычок засунул... нет.\n"))
         if move_1 == 1:
-            self.inventar["Свитки"] += scr
-            print(f"Никакой не бычок, а настоящий магический свиток, теперь у вас их {self.inventar['Зелья']}")
+            a = randint(0,2)
+            if a == 0 or a == 1:
+                self.inventar["Свитки"] += scr
+                print(f"Никакой не бычок, а настоящий магический свиток, теперь у вас их {self.inventar['Свитки']}")
+                return 1
+            else:
+                print(f"Вы потянули бумажку, услышали странный звук и через секунду вам в голову полетел камень.\nК счастью вы успели вовремя среагировать и увернулись. Это была ловушка!")
+                return 0
         elif move_1 == 2:
             print("Вы обошли стороной странную бумажку")
             pass
     def add_potion(self, pot = 1):
         move_1 = int(input("Вы заметили в грязи бутылочку с зельем. Взять?\n1. Да\n2. Мусор какой то... нет.\n"))
         if move_1 == 1:
-            self.inventar["Зелья"] += pot
-            print(f"Это и в прямь оказалась бутылочка с зельем здоровья, теперь у вас их {self.inventar['Зелья']}")
+            a = randint(0, 2)
+            if a == 0 or a == 1:
+                self.inventar["Зелья"] += pot
+                print(f"Это и в прямь оказалась бутылочка с зельем здоровья, теперь у вас их {self.inventar['Зелья']}")
+                return 1
+            else:
+                print(f"Вы взяли бутылочку с мутной желтой жидкостью. \nВы решили открыть пробку и понюхать зелье, лучше бы вы этого не делали...\nОтвратительный запах!!")
+                return 0
         elif move_1 == 2:
             print("Вы осорожно обошли подозрительный флакон и пошли дальше")
             pass
+    def situation_checker(self, lvlmap, chests, r_stuff):
+        """Проверяем, есть ли ситуация на данном тайле"""
+        if (self.pos_y, self.pos_x) in chests:
+            chest_name = "chest" + str(self.pos_y) + str(self.pos_x)
+            chest_name = Chest(self)
+            chest_name.open_and_take()
+            chests.remove((self.pos_y, self.pos_x))
+            lvlmap[self.pos_y][self.pos_x].was_here = True
+        elif (self.pos_y, self.pos_x) in r_stuff:
+            a = randint(0,5)
+            if a == 0:
+                a = randint(0, 1)
+                if a == 1:
+                    self.add_scroll()
+                    r_stuff.remove((self.pos_y, self.pos_x))
+                else:
+                    print("Вы осмотрели небычное место, но заметили, что необычным его делает всего лишь\nпричудливый узор трещин на каменной кладке")
+            elif a == 1:
+                if a == 1:
+                    self.add_potion()
+                    r_stuff.remove((self.pos_y, self.pos_x))
+                else:
+                    print("Вы осмотрели небычное место, но заметили, что необычным его делает\nвсего лишь странного цвета разросшийся мох на стене")
+            elif a == 2:
+                print("Вы приблизились к подозрительному месту, что бы осмотреть его, но\nВнезапно, из-за ближайшей колонны выпрыгнул гоблин!!")
+                goblin_name = "goblin" + str(self.pos_y) + str(self.pos_x)
+                goblin_name = Goblin()
+                result = fight_with_enemy(self, goblin_name)
+                r_stuff.remove((self.pos_y, self.pos_x))
+                return result
+            elif a == 3:
+                if self.next_lvl_key == 0:
+                    self.next_lvl_key = 1
+                    print("Вы нашли ключ!")
+                else:
+                    print("Вы изучили необычное место, при внимательном изучении оно оказалось обычным.")
+            elif a > 3:
+                print("Вы внимательно осмотрели подозрительное место, но это всего лишь была игра света и тени.")
+
+
+
+def player_move(player, lvlmap, chest_positions, random_stuff_position):
+    move_flag = 1
+    def state_refresher(player, lvlmap): #перерисовываем карту, где игрок там
+        for i, j in enumerate(lvlmap):
+            for z, l in enumerate(j):
+                if lvlmap[i][z] == lvlmap[player.pos_y][player.pos_x]:
+                    lvlmap[i][z].state = 2
+                    lvlmap[i][z].was_here = True
+                    lvlmap[i][z].wall = "ˍ@ˍ"
+                else:
+                    lvlmap[i][z].state = 1
+                    if lvlmap[i][z].digger_was_here == False:
+                        lvlmap[i][z].wall = "▓▓▓"
+                    elif (lvlmap[i][z].digger_was_here == True and lvlmap[i][z].situation == None) or lvlmap[i][z].was_here == True:
+                        lvlmap[i][z].wall = "ˍ ˍ"
+                    elif lvlmap[i][z].digger_was_here == True and lvlmap[i][z].situation == "chest":
+                        lvlmap[i][z].wall = "ˍ⮹ˍ"
+                    elif lvlmap[i][z].digger_was_here == True and lvlmap[i][z].situation == "random":
+                        lvlmap[i][z].wall = "ˍ?ˍ"
+
+    while move_flag == 1:
+        state_refresher(player, lvlmap) # записываем карту в соотвествии с нашими мувами
+        matrix_print(lvlmap) # перерисовываем перезаписанную карту
+        state_of_player = player.situation_checker(lvlmap, chest_positions, random_stuff_position) # проверяем движение на наличие ситуации
+        if state_of_player == 0:
+            print("The End")
+            move_flag = 0
+            break
+        elif type(state_of_player) is int and state_of_player != 0:
+            player.raw_hp = state_of_player
+        elif state_of_player == "friendship":
+            pass
+        player.make_move(lvlmap) #обращаемся к методу выбора следующего движения
+
+def retry_for_gen(map_generator2):
+    counter_repeat = (i + i for i in range(1, 100))
+    pass
+
 
 
 class Chest():
@@ -289,7 +538,7 @@ class Chest():
     def take_items(self):
         if  set([*weapons.keys()]) & set([*self.content.keys()]): #сравниваем содержимое сундука и список оружия
             current_weapon_in_chest = list(set([*weapons.keys()]) & set([*self.content.keys()])) #если есть совпадение, сохраняем переменную
-            print(f"Взять {set([*weapons.keys()]) & set([*self.content.keys()])} вместо своего текущего оружия? Сейчас у вас {self.player.weapon}.")
+            print(f"Взять {current_weapon_in_chest[0]} вместо своего текущего оружия? Сейчас у вас {self.player.weapon}.")
             k = int(input("1. Выглядит лучше моего..\n2. Нет, лучше оставлю свое.\n")) #выбираем поменять ли текущее
             if k == 1: #тут происходит перезаписывание текущего и его хар-ки
                 weapon_key = current_weapon_in_chest.pop()
@@ -300,7 +549,7 @@ class Chest():
                 pass
         if  set([*armors.keys()]) & set([*self.content.keys()]): #все то же для брони
             current_armor_in_chest = list(set([*armors.keys()]) & set([*self.content.keys()]))
-            print(f"Взять {set([*armors.keys()]) & set([*self.content.keys()])} вместо своей брони? Сейчас у вас {self.player.armor}.")
+            print(f"Взять {current_armor_in_chest[0]} вместо своей брони? Сейчас у вас {self.player.armor}.")
             k = int(input("1. Выглядит лучше моей..\n2. Нет, лучше оставлю свою.\n"))
             if k == 1:
                 armor_key = current_armor_in_chest.pop()
@@ -311,7 +560,7 @@ class Chest():
                 pass
         if  set([*amulets.keys()]) & set([*self.content.keys()]): #все то же для амулета
             current_amulet_in_chest = list(set([*amulets.keys()]) & set([*self.content.keys()]))
-            print(f"Надеть {set([*amulets.keys()]) & set([*self.content.keys()])} вместо текущего, сейчас у вас {self.player.amulet}.")
+            print(f"Надеть {current_amulet_in_chest[0]} вместо текущего, сейчас у вас {self.player.amulet}.")
             k = int(input("1. Надеть..\n2. Нет, лучше оставлю свой.\n"))
             if k == 1:
                 amulet_key = current_amulet_in_chest.pop()
@@ -331,7 +580,9 @@ class Chest():
             print(f"Зелья вы убрали в сумку, теперь у вас: зелья: - {self.player.inventar['Зелья']} шт.")
         else:
             pass
-
+    def open_and_take(self):
+        self.opening_chest()
+        self.take_items()
 
 
 def fight_with_enemy(player, enemy):
@@ -387,7 +638,7 @@ def fight_with_enemy(player, enemy):
                         print(f"Вы почувствовали прилив ярости и нанесли сокрушительный удар {enemy.name} на {final_damage} урона, у него осталось {enemy.base_hp} жизни")
                         if enemy.base_hp <= 0:
                             print(f"Вы убили {enemy.name}")
-                            return 1
+                            return player_hp
                         else:
                             player_hp = player_hp - inner_enemy_hit()
                             if inner_player_hp_checker() == 0:
@@ -507,12 +758,15 @@ def fight_with_enemy(player, enemy):
                                f"1. Выпить зелье или прочитать свиток.\n"
                                f"2. Попытаться убежать.\n"
                                f"3. Попытаться вступить в переговоры.\n"
-                               f"4. Посмотреть информацию о враге\n"
+                               f"4. Внимательно осмотреть врага\n"
                                f"5. Я передумал, хочу сражаться!\n"))
             if action == 1: #пьем зелье #читаем свиток
                 use_item = player.inventar_use()
                 if use_item == 20:
                     player_hp += 20
+                    player_hp = player_hp - inner_enemy_hit()
+                    if inner_player_hp_checker() == 0:
+                        return 0
                 elif use_item == 1:
                     enemy.base_hp -= round(10 * (player.int / 10))
                     if enemy.base_hp <= 0:
@@ -522,34 +776,137 @@ def fight_with_enemy(player, enemy):
                         print(f"{enemy.name} корчится от боли, ошарашенно вращая глазами\n")
                         pass
             elif action == 2: #побег
-                pass
+                if enemy.mood == 3: #нельзя убежать от кровожадного
+                    player_hp -= 500
+                    print(
+                        "Вы попытались убежать, но повернувшись, почувствовали мощный удар в затылок, затем свет погас..")
+                    if inner_player_hp_checker() == 0:
+                        return 0
+                elif enemy.base_hp / player_hp > 3: #если у врага значительно больше здоровья
+                    if randint(1,2) == 1: #не овезло
+                        player_hp -= 500
+                        print("Вы попытались убежать, но повернувшись, почувствовали мощный удар в затылок, затем свет погас..")
+                        if inner_player_hp_checker() == 0:
+                            return 0
+                    else: #повезло
+                        if randint(1,2) == 1:
+                            print(f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился")
+                            return player_hp
+                        else:
+                            player_hp = round(player_hp/2)
+                            print(f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился,\n"
+                                  f"Но в спешке вы споткнулись и ударились головой, потеряв {player_hp} здоровья")
+                            return player_hp
+                elif 1 < enemy.base_hp / player_hp >= 3: #если у врага больше здоровья
+                    if randint(1, 3) == 1:  # не овезло
+                        player_hp -= 500
+                        print("Вы попытались убежать, но повернувшись, почувствовали мощный удар в затылок, затем свет погас..")
+                        if inner_player_hp_checker() == 0:
+                            return 0
+                    else:  # повезло
+                        if randint(1, 2) == 1:
+                            print(f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился")
+                            return player_hp
+                        else:
+                            hit = round(player_hp * 0.25)
+                            player_hp = player_hp - hit
+                            print(f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился,\n"
+                                f"Но в спешке вы споткнулись и ударились головой, потеряв {hit} здоровья")
+                            return player_hp
+                else: #если у врага меньше здоровья
+                    if randint(1, 100) > 31:
+                        print(
+                            f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился")
+                        return player_hp
+                    else:
+                        hit = round(player_hp * 0.15)
+                        player_hp = player_hp - hit
+                        print(
+                            f"Вы издали отвлекающий крик и резко бросились в сторону, до того как {enemy.name} опомнился,\n"
+                            f"Но в спешке вы споткнулись и ударились головой, потеряв {hit} здоровья")
+                        return player_hp
             elif action == 3: #переговоры
                 action = int(input(f"Что сказать?\n"
                                    f"1. Извините, Вы не подскажете, как пройти в библиотеку?\n"
                                    f"2. Слушай, друг... Не хотелось бы тебя убивать. А ты хочешь помирать?\n"
                                    f"3. Эй ты, чертов {enemy.get_class_name()}, либо сдавайся, либо я выпущу твои кишки.\n"))
-                
-                if action == 1: #библиотека
-                    if made_attack == 0: #уже попытался ударить
-                        pass
-                    if made_attack > 0: #не было насилия
-                        pass
+                if action == 1: #библиотека #1,2
+                    if made_attack == 0: #не было насилия
+                        if enemy.mood == 0:#нейтрально
+                            print(enemy.enemy_mood[1])
+                            action = int(input(f"Что сказать?\n"
+                                               f"1. Я не ошибся, когда увидел интелект в ваших глазах!\n"
+                                               f"2. Хм... нет, я передумал.\n"))
+                            if action == 1:
+                                return "friendship"
+                            if action == 2:
+                                pass
+                        if enemy.mood == 1:#недруг
+                            print(enemy.enemy_mood[1])
+                        if enemy.mood == 2:#враг
+                            print(enemy.enemy_mood[1])
+                        if enemy.mood == 3:#кровожадный
+                            print(enemy.enemy_mood[2])
+                            action = int(input(f"Что выбрать?\n"
+                                               f"1. Посмотреть куда указывает {enemy.name}!\n"
+                                               f"2. Хм... нет, я передумал.\n"))
+                            if action == 1:
+                                player_hp = player_hp - 500
+                                print("Вы почувствовали мощный удар в затылок, затем свет погас..")
+                                if inner_player_hp_checker() == 0:
+                                    return 0
+                            if action == 2:
+                                pass
+                    if made_attack > 0: #было насилие
+                        if enemy.mood == 0: #нейтрально
+                            print(enemy.enemy_mood[2])
+                            action = int(input(f"Что сказать?\n"
+                                               f"1. Я приношу вам глубочайшие извинения {enemy.name}!\n"
+                                               f"2. Хм... ну как хочешь.\n"))
+                            if action == 1:
+                                print(enemy.enemy_mood[3])
+                                return "friendship"
+                            if action == 2:
+                                pass
+                        if enemy.mood == 1: #недруг
+                            print(enemy.enemy_mood[2])
+                            player_hp = player_hp - inner_enemy_hit()
+                            if inner_player_hp_checker() == 0:
+                                return 0
+                        if enemy.mood == 2: #враг
+                            print(enemy.enemy_mood[2])
+                            player_hp = player_hp - inner_enemy_hit()
+                            if inner_player_hp_checker() == 0:
+                                return 0
+                        if enemy.mood == 3: #кровожадный
+                            print(enemy.enemy_mood[2])
+                            action = int(input(f"Что выбрать?\n"
+                                               f"1. Посмотреть куда указывает {enemy.name}!\n"
+                                               f"2. Хм... нет, я передумал.\n"))
+                            if action == 1:
+                                player_hp = player_hp - 500
+                                print("Вы почувствовали мощный удар в затылок, затем свет погас..")
+                                if inner_player_hp_checker() == 0:
+                                    return 0
+                            if action == 2:
+                                pass
+                if action == 2: #мягкое предложение помириться
+                    print("Пока не готово")
+                if action == 3: #жесткое предложение помириться
+                    print("Пока не готово")
             elif action == 5: #взад
                 pass
             elif action == 4: #информация о враге
                 action = int(input(f"Что рассмотреть поподробнее?\n"
                                    f"1. Оружие.\n"
                                    f"2. Броня.\n"
-                                   f"3. Посмотреть на {enemy.name} в целом.\n"
+                                   f"3. Общая информация о {enemy.name}.\n"
                                    f"4. Назад\n"))
                 if action == 1: #информация о оружии
                     print(f"{enemy.weapon[0]},\n{enemy.weapon[2]}")
                 elif action == 2: #информация о броне
                     print(f"{enemy.base_armour},\n{enemy.armour_description}")
                 elif action == 3: #информация в целом
-                    pass
+                    print(enemy)
                 elif action == 4:
                     pass
-
-
-
